@@ -1,0 +1,25 @@
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { map, Observable } from 'rxjs';
+
+@Injectable()
+export class TransformInterceptor<T> implements NestInterceptor<T, any> {
+  intercept(context: ExecutionContext, next: CallHandler) {
+    const ctx = context.switchToHttp();
+    const request = ctx.getRequest();
+
+    return next.handle().pipe(
+      map((data) => ({
+        success: true,
+        message: 'Success',
+        path: request.url,
+        timestamp: new Date().toISOString(),
+        data,
+      })),
+    );
+  }
+}

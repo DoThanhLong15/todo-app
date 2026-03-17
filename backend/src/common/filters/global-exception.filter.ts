@@ -19,19 +19,26 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message: any = 'Internal server error';
+
+    let errorMessage: any = 'Internal server error';
+    let clientMessage = 'Something went wrong';
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const res = exception.getResponse();
 
-      message = typeof res === 'string' ? res : (res as any).message || res;
+      errorMessage =
+        typeof res === 'string' ? res : (res as any).message || res;
+
+      if (status < 500) {
+        clientMessage = errorMessage;
+      }
     } else if (exception instanceof Error) {
-      message = exception.message;
+      errorMessage = exception.message;
     }
 
     this.logger.error(
-      `[${request.method}] ${request.url} - ${status} - ${message}`,
+      `${request.method} ${request.url} - ${status} - ${errorMessage}`,
       exception instanceof Error ? exception.stack : '',
     );
 
@@ -40,7 +47,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       statusCode: status,
       path: request.url,
       timestamp: new Date().toISOString(),
-      message,
+      message: clientMessage,
     });
   }
 }

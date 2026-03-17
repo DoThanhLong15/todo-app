@@ -11,12 +11,12 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const serverPort = configService.get<number>('app.port');
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
-
+  // Global interceptors & filters
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
     new TransformInterceptor(),
   );
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   if (!serverPort) {
     throw new Error('Server Port is not defined in configuration');

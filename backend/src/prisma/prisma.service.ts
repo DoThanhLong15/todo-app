@@ -1,29 +1,25 @@
 import { PrismaClient } from './../../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import {
   Injectable,
   OnModuleInit,
   OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-/* The `PrismaService` class extends `PrismaClient` and implements `OnModuleInit` and
-`OnModuleDestroy`, with logging configured for query, error, and warn levels. */
 export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor() {
-    const accelerateUrl = process.env.DATABASE_URL;
-
-    if (!accelerateUrl) {
-      throw new Error('DATABASE_URL is not defined');
-    }
+  constructor(private configService: ConfigService) {
+    const adapter = new PrismaPg({ connectionString: configService.get('database.url') });
 
     super({
-      accelerateUrl,
+      adapter,
       log: [
         { emit: 'event', level: 'query' },
         { emit: 'event', level: 'error' },

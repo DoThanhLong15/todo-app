@@ -1,0 +1,6 @@
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_UPDATED
+  COMMENT_ADDED
+  MEMBER_INVITED
+}

@@ -1,0 +1,20 @@
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  name            String?
+  avatarUrl       String?
+  isEmailVerified Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  memberships   Membership[]
+  taskAssignees TaskAssignee[]
+  comments      Comment[]
+  attachments   Attachment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  @@index([email])
+}

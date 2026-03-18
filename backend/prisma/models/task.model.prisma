@@ -1,0 +1,22 @@
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  projectId   String
+  createdById String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignees   TaskAssignee[]
+  comments    Comment[]
+  attachments Attachment[]
+
+  @@index([projectId])
+  @@index([createdById])
+  @@index([status])
+}

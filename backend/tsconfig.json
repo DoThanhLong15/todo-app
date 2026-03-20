@@ -16,7 +16,14 @@
     "strict": true,
     "noImplicitAny": false,
     "moduleResolution": "node",
-    "lib": ["esnext"]
+    "lib": ["esnext"],
+    "paths": {
+      "@/*": ["src/*"],
+      "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
+      "@prisma/*": ["src/prisma/*"],
+      "@generated-prisma/*": ["./generated/prisma/*"],
+    }
   },
   "include": ["src/**/*", "test/**/*", "@generated"],
   "exclude": ["node_modules", "dist"]

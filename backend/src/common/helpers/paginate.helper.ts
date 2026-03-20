@@ -1,7 +1,7 @@
 // src/common/helpers/paginate.helper.ts
 import { Prisma } from 'generated/prisma/client';
-import { PaginationDto } from '../dto/pagination.dto';
-import { PaginationResult } from '../interfaces/pagination.interface';
+import { PaginationDto } from '@common/dto/pagination.dto';
+import { PaginationResult } from '@common/interfaces/pagination.interface';
 
 export async function paginate<T>(
   model: any,

@@ -1,4 +1,4 @@
-import { Prisma, TaskStatus } from 'generated/prisma/client';
+import { Prisma, TaskStatus } from '@generated-prisma/client';
 
 export class FilterBuilder {
   private andConditions: Prisma.TaskWhereInput[] = [];

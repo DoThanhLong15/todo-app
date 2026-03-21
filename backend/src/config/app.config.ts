@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+import { getEnvOrThrow, getNumberEnvOrThrow } from './helpers/env.helper';
 
 export interface AppConfig {
   port: number;
@@ -6,16 +7,11 @@ export interface AppConfig {
 }
 
 export default registerAs('app', (): AppConfig => {
-  const serverPort = process.env.SERVER_PORT;
-
-  if (!serverPort) {
-    throw new Error('Server Port is not defined in .env');
-  }
-
-  const nodeEnv = process.env.NODE_ENV || 'development';
+  const port = getNumberEnvOrThrow('SERVER_PORT');
+  const nodeEnv = getEnvOrThrow('NODE_ENV');
 
   return {
-    port: parseInt(serverPort, 10),
-    nodeEnv
+    port,
+    nodeEnv,
   };
 });

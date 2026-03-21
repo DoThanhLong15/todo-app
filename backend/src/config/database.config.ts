@@ -1,29 +1,34 @@
 import { registerAs } from '@nestjs/config';
+import { getEnvOrThrow, getNumberEnvOrThrow } from './helpers/env.helper';
 
 export interface DatabaseConfig {
   url: string;
-  host?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  database?: string;
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
 }
 
 export default registerAs('database', (): DatabaseConfig => {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = getEnvOrThrow('DATABASE_URL');
 
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL is not defined in .env');
+  let parsed: URL;
+
+  try {
+    parsed = new URL(databaseUrl);
+  } catch {
+    throw new Error('DATABASE_URL is not a valid URL');
   }
 
-  const parsed = new URL(databaseUrl);
+  const port = getNumberEnvOrThrow('DATABASE_PORT');
 
   return {
     url: databaseUrl,
     host: parsed.hostname,
-    port: Number(parsed.port) || 5432,
-    username: parsed.username,
-    password: parsed.password,
-    database: parsed.pathname.replace('/', ''),
+    port,
+    username: decodeURIComponent(parsed.username),
+    password: decodeURIComponent(parsed.password),
+    database: parsed.pathname.replace(/^\//, ''),
   };
 });

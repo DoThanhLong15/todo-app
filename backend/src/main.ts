@@ -1,6 +1,9 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+
+import { AppModule } from '@/app.module';
+
 import { GlobalExceptionFilter } from '@common/filters/global-exception.filter';
 import { LoggingInterceptor } from '@common/interceptors/logging-exception.interceptor';
 import { TransformInterceptor } from '@common/interceptors/transform.interceptor';
@@ -10,6 +13,15 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const serverPort = configService.get<number>('app.port');
+
+  // Global validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Global interceptors & filters
   app.useGlobalInterceptors(

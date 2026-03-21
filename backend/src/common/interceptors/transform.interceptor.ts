@@ -6,6 +6,9 @@ import {
 } from '@nestjs/common';
 import { map } from 'rxjs';
 
+import { BaseResponse } from '@common/interfaces/base-response.interface';
+import { COMMON_MESSAGES } from '@common/constants/message.constant';
+
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, any> {
   intercept(context: ExecutionContext, next: CallHandler) {
@@ -13,13 +16,15 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
     const request = ctx.getRequest();
 
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        message: 'Success',
-        path: request.url,
-        timestamp: new Date().toISOString(),
-        data,
-      })),
+      map(
+        (response: any): BaseResponse => ({
+          success: true,
+          message: response?.message || COMMON_MESSAGES.SUCCESS,
+          path: request.url,
+          timestamp: new Date().toISOString(),
+          data: response?.data ?? response,
+        }),
+      ),
     );
   }
 }

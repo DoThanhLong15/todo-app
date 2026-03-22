@@ -19,6 +19,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
       map(
         (response: any): BaseResponse => ({
           success: true,
+          statusCode: response.statusCode,
           message: response?.message || COMMON_MESSAGES.SUCCESS,
           path: request.url,
           timestamp: new Date().toISOString(),

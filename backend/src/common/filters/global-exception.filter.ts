@@ -3,10 +3,16 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
-  HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+
+import { BaseResponse } from '@common/interfaces/base-response.interface';
+import {
+  handleHttpException,
+  handleUnknownException,
+} from '@/common/utils/exception-handling.util';
+import { logError } from '@/common/utils/error-logging.util';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -18,36 +24,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-    let errorMessage: any = 'Internal server error';
-    let clientMessage = 'Something went wrong';
+    let error: BaseResponse;
 
     if (exception instanceof HttpException) {
-      status = exception.getStatus();
-      const res = exception.getResponse();
-
-      errorMessage =
-        typeof res === 'string' ? res : (res as any).message || res;
-
-      if (status < 500) {
-        clientMessage = errorMessage;
-      }
-    } else if (exception instanceof Error) {
-      errorMessage = exception.message;
+      error = handleHttpException(exception, request);
+    } else {
+      error = handleUnknownException(exception, request);
     }
 
-    this.logger.error(
-      `${request.method} ${request.url} - ${status} - ${errorMessage}`,
-      exception instanceof Error ? exception.stack : '',
-    );
+    logError(this.logger, request, error.statusCode, error.message, exception);
 
-    response.status(status).json({
-      success: false,
-      statusCode: status,
-      path: request.url,
-      timestamp: new Date().toISOString(),
-      message: clientMessage,
-    });
+    return response.status(error.statusCode).json(error);
   }
 }

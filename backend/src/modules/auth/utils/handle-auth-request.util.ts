@@ -1,7 +1,7 @@
 import { UnauthorizedException } from '@nestjs/common';
 
 import { UserPayload } from '@modules/auth/interfaces/user-payload.interface';
-import { throwException } from '@common/utils/global-exception.util';
+import { throwException } from '@/common/utils/exception-handling.util';
 
 export function handleAuthRequest<T extends UserPayload>(
   err: unknown,

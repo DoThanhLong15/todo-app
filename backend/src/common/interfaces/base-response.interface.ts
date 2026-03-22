@@ -1,6 +1,7 @@
 export interface BaseResponse<T = any> {
   success: boolean;
-  message: string;
+  statusCode: number;
+  message: string | string[];
   path: string;
   timestamp: string;
   data?: T;

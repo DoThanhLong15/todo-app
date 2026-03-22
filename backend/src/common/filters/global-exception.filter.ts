@@ -11,8 +11,8 @@ import { BaseResponse } from '@common/interfaces/base-response.interface';
 import {
   handleHttpException,
   handleUnknownException,
-} from '@/common/utils/exception-handling.util';
-import { logError } from '@/common/utils/error-logging.util';
+} from '@common/utils/exception-handling.util';
+import { logError } from '@common/utils/error-logging.util';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

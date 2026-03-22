@@ -3,18 +3,17 @@ export const AUTH_SERVICE_MESSAGE = {
   LOGOUT: 'Logged out successfully!',
   REGISTER: 'Register success. Please verify your email.',
   REFRESH: 'Refresh token successfully!'
-}
+} as const;
 
 export const JWT_STRATEGY = 'jwt';
 export const JWT_REFRESH_STRATEGY = 'jwt-refresh';
 
 export const JWT_AUTH_MESSAGES = {
-  IS_NOT_EMAIL_VERIFIED: 'Email is not verified!',
   EXPIRED_TOKEN: 'Token expired',
   INVALID_CREDENTIAL: 'Invalid credentials',
   INVALID_REFRESH_TOKEN: 'Invalid refresh token',
   INVALID_TOKEN: 'Invalid token',
-};
+} as const;
 
 export const JWT_VALIDATION_MESSAGES = {
   NAME: {
@@ -26,6 +25,7 @@ export const JWT_VALIDATION_MESSAGES = {
   EMAIL: {
     EXIST: 'Email already exists',
     INVALID: 'Email is not valid',
+    IS_NOT_VERIFIED: 'Email is not verified!',
     REQUIRED: 'Email is required',
   },
   PASSWORD: {
@@ -33,6 +33,6 @@ export const JWT_VALIDATION_MESSAGES = {
     MIN: 'Password must be at least 6 characters',
     REQUIRED: 'Password is required',
   },
-};
+} as const;
 
 export const IS_PUBLIC_KEY = 'isPublic';

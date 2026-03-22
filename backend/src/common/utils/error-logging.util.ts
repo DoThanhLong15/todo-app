@@ -9,9 +9,11 @@ export function logError(
   exception?: unknown,
 ): void {
   const message = formatMessage(request, status, errorMessage);
-  const stack = getStackTrace(exception);
 
-  logger.error(message, stack);
+  // const stack = getStackTrace(exception);
+  // logger.error(message, stack);
+
+  logger.error(message);
 }
 
 function formatMessage(

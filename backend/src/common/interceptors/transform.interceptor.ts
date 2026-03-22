@@ -23,7 +23,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
           message: response?.message || COMMON_MESSAGES.SUCCESS,
           path: request.url,
           timestamp: new Date().toISOString(),
-          data: response?.data ?? response,
+          data: response?.data,
         }),
       ),
     );

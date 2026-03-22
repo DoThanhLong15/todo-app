@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 
 import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
-import { JWT_REFRESH_STRATEGY } from '@/modules/auth/constants/auth.constant';
+import { JWT_AUTH_MESSAGES, JWT_REFRESH_STRATEGY } from '@modules/auth/constants/auth.constant';
 import { UserWithRefreshToken } from '@modules/auth/interfaces/user-with-refresh-token.interface';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       req.cookies?.refreshToken || req.headers['x-refresh-token'];
 
     if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token missing');
+      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
     return {

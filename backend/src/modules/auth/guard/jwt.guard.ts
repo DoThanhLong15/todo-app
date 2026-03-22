@@ -2,8 +2,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { IS_PUBLIC_KEY, JWT_AUTH_MESSAGES, JWT_STRATEGY } from '@/modules/auth/constants/auth.constant';
-import { handleAuthRequest } from '../utils/handle-auth-request.util';
+import { handleAuthRequest } from '@modules/auth/utils/handle-auth-request.util';
+import { IS_PUBLIC_KEY, JWT_AUTH_MESSAGES, JWT_STRATEGY } from '@modules/auth/constants/auth.constant';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard(JWT_STRATEGY) {

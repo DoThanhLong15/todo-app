@@ -8,12 +8,19 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { AUTH_SERVICE_MESSAGE, JWT_AUTH_MESSAGES, JWT_VALIDATION_MESSAGES } from '@modules/auth/constants/auth.constant';
-import { RegisterDto } from '@/modules/auth/dto/register.dto';
-import { LoginDto } from '@/modules/auth/dto/login.dto';
-import { UserService } from '@modules/user/user.service';
+import {
+  AUTH_SERVICE_MESSAGE,
+  JWT_AUTH_MESSAGES,
+  JWT_VALIDATION_MESSAGES,
+} from '@modules/auth/constants/auth.constant';
+import { BaseResponse } from '@common/interfaces/base-response.interface';
+import { COMMON_STATUS_CODE } from '@common/constants/status-code.constant';
+import { EXCEPTION_MESSAGE } from '@common/constants/message.constant';
 import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
-import { throwException } from '@common/utils/global-exception.util';
+import { JwtResponse } from '@modules/auth/interfaces/jwt-response.interface';
+import { LoginDto } from '@modules/auth/dto/login.dto';
+import { RegisterDto } from '@modules/auth/dto/register.dto';
+import { UserService } from '@modules/user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -23,12 +30,12 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async register(dto: RegisterDto) {
+  async register(dto: RegisterDto): Promise<BaseResponse> {
     const { email, password, name } = dto;
 
     const existingUser = await this.userService.findByEmail(email);
     if (existingUser) {
-      throwException(ConflictException, JWT_VALIDATION_MESSAGES.EMAIL.EXIST);
+      throw new ConflictException(JWT_VALIDATION_MESSAGES.EMAIL.EXIST);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,53 +49,62 @@ export class AuthService {
 
     return {
       message: AUTH_SERVICE_MESSAGE.REGISTER,
+      statusCode: COMMON_STATUS_CODE.CREATED,
     };
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto): Promise<BaseResponse> {
     const { email, password } = dto;
 
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throwException(UnauthorizedException ,JWT_AUTH_MESSAGES.INVALID_CREDENTIAL);
+      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_CREDENTIAL);
     }
 
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) {
-    //   throw new UnauthorizedException('Invalid credentials');
-    // }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     if (!user.isEmailVerified) {
-      throwException(ForbiddenException, JWT_AUTH_MESSAGES.INVALID_CREDENTIAL);
+      throw new ForbiddenException(
+        JWT_VALIDATION_MESSAGES.EMAIL.IS_NOT_VERIFIED,
+      );
     }
 
     return this.handleTokenIssuance(user, AUTH_SERVICE_MESSAGE.LOGIN);
   }
 
-  async refresh(userId: string, refreshToken: string) {
+  async refresh(userId: string, refreshToken: string): Promise<BaseResponse> {
     const user = await this.userService.findById(userId);
     if (!user || !user.refreshToken) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!isMatch) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
-    return this.handleTokenIssuance(user,  AUTH_SERVICE_MESSAGE.REFRESH);
+    return this.handleTokenIssuance(user, AUTH_SERVICE_MESSAGE.REFRESH);
   }
 
-  async logout(userId: string) {
+  async logout(userId: string): Promise<BaseResponse> {
+    const user = await this.userService.findById(userId);
+    if (!user || !user.refreshToken) {
+      throw new ForbiddenException(EXCEPTION_MESSAGE.FORBIDDEN);
+    }
+
     await this.userService.removeRefreshToken(userId);
 
     return {
-      message:  AUTH_SERVICE_MESSAGE.LOGOUT,
+      message: AUTH_SERVICE_MESSAGE.LOGOUT,
+      statusCode: COMMON_STATUS_CODE.SUCCESS,
     };
   }
 
-  private async generateTokens(user: any) {
+  private async generateTokens(user: any): Promise<JwtResponse>{
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -108,7 +124,7 @@ export class AuthService {
     };
   }
 
-  private async handleTokenIssuance(user: any, message: string) {
+  private async handleTokenIssuance(user: any, message: string): Promise<BaseResponse<JwtResponse>> {
     const tokens = await this.generateTokens(user);
 
     const saltRounds = this.configService.get<number>('bcrypt.saltRounds');
@@ -122,7 +138,8 @@ export class AuthService {
 
     return {
       data: tokens,
-      message
+      message,
+      statusCode: COMMON_STATUS_CODE.SUCCESS,
     };
   }
 }

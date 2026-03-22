@@ -3,8 +3,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { JwtPayload } from '@/modules/auth/interfaces/jwt-payload.interface';
-import { JWT_STRATEGY } from '@/modules/auth/constants/auth.constant';
+import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
+import { JWT_STRATEGY } from '@modules/auth/constants/auth.constant';
 import { UserPayload } from '@modules/auth/interfaces/user-payload.interface';
 
 @Injectable()

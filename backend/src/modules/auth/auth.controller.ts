@@ -1,19 +1,14 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, UseGuards } from '@nestjs/common';
 
 import { AuthService } from '@modules/auth/auth.service';
-import { COMMON_STATUS_CODE } from '@common/constants/status-code.constant';
-import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
 import { JwtRefreshGuard } from '@modules/auth/guard/jwt-refresh.guard';
 import { LoginDto } from '@modules/auth/dto/login.dto';
-import { Public } from '@modules/auth/decorators/public.decorator';
+import { Public } from '@common/decorators/public.decorator';
 import { RegisterDto } from '@modules/auth/dto/register.dto';
-import { UserWithRefreshToken } from '@modules/auth/interfaces/user-with-refresh-token.interface';
+import { RefreshTokenPayload } from '@modules/auth/interfaces/refresh-token-payload.interface';
+
+import { COMMON_STATUS_CODE } from '@common/constants/status-code.constant';
+import { CurrentUser } from '@common/decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +31,7 @@ export class AuthController {
   @Public()
   @HttpCode(COMMON_STATUS_CODE.SUCCESS)
   @UseGuards(JwtRefreshGuard)
-  refresh(@CurrentUser() user: UserWithRefreshToken) {
+  refresh(@CurrentUser() user: RefreshTokenPayload) {
     return this.authService.refresh(user.userId, user.refreshToken);
   }
 

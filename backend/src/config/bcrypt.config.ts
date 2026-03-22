@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { getNumberEnvOrThrow } from '@config/helpers/env.helper';
 
 export interface BcryptConfig {

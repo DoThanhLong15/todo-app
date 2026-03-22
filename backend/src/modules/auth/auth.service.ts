@@ -9,15 +9,15 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import {
-  AUTH_SERVICE_MESSAGE,
-  JWT_AUTH_MESSAGES,
-  JWT_VALIDATION_MESSAGES,
-} from '@modules/auth/constants/auth.constant';
+  AUTH_MESSAGES,
+  JWT_ERROR_MESSAGES,
+  AUTH_VALIDATION_MESSAGES,
+} from '@common/constants/auth.constant';
+import { AuthTokenPayload } from '@modules/auth/interfaces/auth-token-payload.interface';
 import { BaseResponse } from '@common/interfaces/base-response.interface';
 import { COMMON_STATUS_CODE } from '@common/constants/status-code.constant';
 import { EXCEPTION_MESSAGE } from '@common/constants/message.constant';
 import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
-import { JwtResponse } from '@modules/auth/interfaces/jwt-response.interface';
 import { LoginDto } from '@modules/auth/dto/login.dto';
 import { RegisterDto } from '@modules/auth/dto/register.dto';
 import { UserService } from '@modules/user/user.service';
@@ -35,7 +35,9 @@ export class AuthService {
 
     const existingUser = await this.userService.findByEmail(email);
     if (existingUser) {
-      throw new ConflictException(JWT_VALIDATION_MESSAGES.EMAIL.EXIST);
+      throw new ConflictException(
+        AUTH_VALIDATION_MESSAGES.EMAIL.ALREADY_EXISTS,
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,7 +50,7 @@ export class AuthService {
     });
 
     return {
-      message: AUTH_SERVICE_MESSAGE.REGISTER,
+      message: AUTH_MESSAGES.REGISTER_SUCCESS,
       statusCode: COMMON_STATUS_CODE.CREATED,
     };
   }
@@ -58,36 +60,34 @@ export class AuthService {
 
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_CREDENTIAL);
+      throw new UnauthorizedException(JWT_ERROR_MESSAGES.INVALID_CREDENTIALS);
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(JWT_ERROR_MESSAGES.INVALID_CREDENTIALS);
     }
 
     if (!user.isEmailVerified) {
-      throw new ForbiddenException(
-        JWT_VALIDATION_MESSAGES.EMAIL.IS_NOT_VERIFIED,
-      );
+      throw new ForbiddenException(AUTH_VALIDATION_MESSAGES.EMAIL.NOT_VERIFIED);
     }
 
-    return this.handleTokenIssuance(user, AUTH_SERVICE_MESSAGE.LOGIN);
+    return this.handleTokenIssuance(user, AUTH_MESSAGES.LOGIN_SUCCESS);
   }
 
   async refresh(userId: string, refreshToken: string): Promise<BaseResponse> {
     const user = await this.userService.findById(userId);
     if (!user || !user.refreshToken) {
-      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
+      throw new UnauthorizedException(JWT_ERROR_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!isMatch) {
-      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
+      throw new UnauthorizedException(JWT_ERROR_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
-    return this.handleTokenIssuance(user, AUTH_SERVICE_MESSAGE.REFRESH);
+    return this.handleTokenIssuance(user, AUTH_MESSAGES.REFRESH_TOKEN_SUCCESS);
   }
 
   async logout(userId: string): Promise<BaseResponse> {
@@ -99,12 +99,12 @@ export class AuthService {
     await this.userService.removeRefreshToken(userId);
 
     return {
-      message: AUTH_SERVICE_MESSAGE.LOGOUT,
+      message: AUTH_MESSAGES.LOGOUT_SUCCESS,
       statusCode: COMMON_STATUS_CODE.SUCCESS,
     };
   }
 
-  private async generateTokens(user: any): Promise<JwtResponse>{
+  private async generateTokens(user: any): Promise<AuthTokenPayload> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -124,7 +124,10 @@ export class AuthService {
     };
   }
 
-  private async handleTokenIssuance(user: any, message: string): Promise<BaseResponse<JwtResponse>> {
+  private async handleTokenIssuance(
+    user: any,
+    message: string,
+  ): Promise<BaseResponse<AuthTokenPayload>> {
     const tokens = await this.generateTokens(user);
 
     const saltRounds = this.configService.get<number>('bcrypt.saltRounds');

@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { getEnvOrThrow } from '@config/helpers/env.helper';
 
 export interface JwtConfig {

@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
+
+import { CurrentUser } from '@common/decorators/current-user.decorator';
 
 @Controller('users')
 export class UserController {

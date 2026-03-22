@@ -4,13 +4,17 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 
 import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
-import { JWT_AUTH_MESSAGES, JWT_REFRESH_STRATEGY } from '@modules/auth/constants/auth.constant';
-import { UserWithRefreshToken } from '@modules/auth/interfaces/user-with-refresh-token.interface';
+import { RefreshTokenPayload } from '@modules/auth/interfaces/refresh-token-payload.interface';
+
+import {
+  JWT_ERROR_MESSAGES,
+  JWT_STRATEGIES,
+} from '@common/constants/auth.constant';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
-  JWT_REFRESH_STRATEGY,
+  JWT_STRATEGIES.REFRESH,
 ) {
   constructor(private readonly configService: ConfigService) {
     super({
@@ -26,12 +30,12 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
 
-  async validate(req: any, payload: JwtPayload): Promise<UserWithRefreshToken> {
+  async validate(req: any, payload: JwtPayload): Promise<RefreshTokenPayload> {
     const refreshToken =
       req.cookies?.refreshToken || req.headers['x-refresh-token'];
 
     if (!refreshToken) {
-      throw new UnauthorizedException(JWT_AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
+      throw new UnauthorizedException(JWT_ERROR_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
     return {

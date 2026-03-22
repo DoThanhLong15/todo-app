@@ -1,5 +1,6 @@
 import { registerAs } from '@nestjs/config';
-import { getEnvOrThrow, getNumberEnvOrThrow } from './helpers/env.helper';
+
+import { getEnvOrThrow, getNumberEnvOrThrow } from '@config/helpers/env.helper';
 
 export interface AppConfig {
   port: number;

@@ -1,5 +1,5 @@
-// src/common/helpers/paginate.helper.ts
 import { Prisma } from 'generated/prisma/client';
+
 import { PaginationDto } from '@common/dto/pagination.dto';
 import { PaginationResult } from '@common/interfaces/pagination.interface';
 

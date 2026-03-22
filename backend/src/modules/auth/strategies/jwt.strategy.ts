@@ -4,11 +4,15 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
 import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
-import { JWT_STRATEGY } from '@modules/auth/constants/auth.constant';
-import { UserPayload } from '@modules/auth/interfaces/user-payload.interface';
+import { UserPayload } from '@modules/user/interfaces/user-payload.interface';
+
+import { JWT_STRATEGIES } from '@common/constants/auth.constant';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY) {
+export class JwtStrategy extends PassportStrategy(
+  Strategy,
+  JWT_STRATEGIES.ACCESS,
+) {
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

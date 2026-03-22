@@ -2,6 +2,8 @@ import { registerAs } from '@nestjs/config';
 
 import { getEnvOrThrow, getNumberEnvOrThrow } from '@config/helpers/env.helper';
 
+import { DB_ENV_KEYS } from '@common/constants/db-env.constant';
+
 export interface DatabaseConfig {
   url: string;
   host: string;
@@ -12,7 +14,7 @@ export interface DatabaseConfig {
 }
 
 export default registerAs('database', (): DatabaseConfig => {
-  const databaseUrl = getEnvOrThrow('DATABASE_URL');
+  const databaseUrl = getEnvOrThrow(DB_ENV_KEYS.URL);
 
   let parsed: URL;
 
@@ -22,7 +24,7 @@ export default registerAs('database', (): DatabaseConfig => {
     throw new Error('DATABASE_URL is not a valid URL');
   }
 
-  const port = getNumberEnvOrThrow('DATABASE_PORT');
+  const port = getNumberEnvOrThrow(DB_ENV_KEYS.PORT);
 
   return {
     url: databaseUrl,

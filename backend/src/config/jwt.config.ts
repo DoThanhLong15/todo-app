@@ -2,6 +2,8 @@ import { registerAs } from '@nestjs/config';
 
 import { getEnvOrThrow } from '@config/helpers/env.helper';
 
+import { JWT_ENV_KEYS } from '@common/constants/jwt-env.constant';
+
 export interface JwtConfig {
   accessExpiresIn: string;
   accessSecret: string;
@@ -10,10 +12,10 @@ export interface JwtConfig {
 }
 
 export default registerAs('jwt', (): JwtConfig => {
-  const accessExpiresIn = getEnvOrThrow('JWT_ACCESS_EXPIRES');
-  const accessSecret = getEnvOrThrow('JWT_ACCESS_SECRET');
-  const refreshExpiresIn = getEnvOrThrow('JWT_REFRESH_EXPIRES');
-  const refreshSecret = getEnvOrThrow('JWT_REFRESH_SECRET');
+  const accessExpiresIn = getEnvOrThrow(JWT_ENV_KEYS.ACCESS_EXPIRES);
+  const accessSecret = getEnvOrThrow(JWT_ENV_KEYS.ACCESS_SECRET);
+  const refreshExpiresIn = getEnvOrThrow(JWT_ENV_KEYS.REFRESH_EXPIRES);
+  const refreshSecret = getEnvOrThrow(JWT_ENV_KEYS.REFRESH_SECRET);
 
   return {
     accessExpiresIn,

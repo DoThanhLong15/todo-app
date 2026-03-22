@@ -8,19 +8,20 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+import { AuthTokenPayload } from '@modules/auth/interfaces/auth-token-payload.interface';
+import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
+import { LoginDto } from '@modules/auth/dto/login.dto';
+import { RegisterDto } from '@modules/auth/dto/register.dto';
+import { UserService } from '@modules/user/user.service';
+
 import {
   AUTH_MESSAGES,
   JWT_ERROR_MESSAGES,
   AUTH_VALIDATION_MESSAGES,
 } from '@common/constants/auth.constant';
-import { AuthTokenPayload } from '@modules/auth/interfaces/auth-token-payload.interface';
 import { BaseResponse } from '@common/interfaces/base-response.interface';
 import { COMMON_STATUS_CODE } from '@common/constants/status-code.constant';
 import { EXCEPTION_MESSAGE } from '@common/constants/message.constant';
-import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
-import { LoginDto } from '@modules/auth/dto/login.dto';
-import { RegisterDto } from '@modules/auth/dto/register.dto';
-import { UserService } from '@modules/user/user.service';
 
 @Injectable()
 export class AuthService {

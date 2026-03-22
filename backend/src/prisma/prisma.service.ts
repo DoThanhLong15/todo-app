@@ -8,6 +8,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { getEnvOrThrow } from '@config/helpers/env.helper';
+
+import { APP_ENV_KEYS } from '@common/constants/app-env.constant';
+
 @Injectable()
 export class PrismaService
   extends PrismaClient
@@ -30,7 +34,7 @@ export class PrismaService
 
   async onModuleInit() {
     // Log slow queries (> 2000ms) in development
-    if (process.env.NODE_ENV === 'development') {
+    if (getEnvOrThrow(APP_ENV_KEYS.NODE_ENV) === 'development') {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore — Prisma event typing
       this.$on('query', (e: { query: string; duration: number }) => {

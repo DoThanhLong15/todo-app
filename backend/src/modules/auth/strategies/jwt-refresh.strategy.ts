@@ -6,6 +6,7 @@ import { Strategy } from 'passport-jwt';
 import { JwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
 import { RefreshTokenPayload } from '@modules/auth/interfaces/refresh-token-payload.interface';
 
+import { JWT_ENV_KEYS } from '@common/constants/jwt-env.constant';
 import {
   JWT_ERROR_MESSAGES,
   JWT_STRATEGIES,
@@ -25,7 +26,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
         return req.headers['x-refresh-token'];
       },
-      secretOrKey: configService.get('JWT_REFRESH_SECRET'),
+      secretOrKey: configService.get(JWT_ENV_KEYS.REFRESH_SECRET),
       passReqToCallback: true,
     });
   }
